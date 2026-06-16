@@ -27,7 +27,7 @@ async function runTest() {
 
   // 2. Log in student
   console.log('\n[2] Logging in student...');
-  const loginRes = await fetch(`${BACKEND_URL}/api/auth/login`, {
+  const loginRes = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email: studentEmail, password })
