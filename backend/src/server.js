@@ -15,7 +15,10 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: "*",
+  credentials: true
+}));
 app.use(express.json());
 
 // Auth Endpoints
@@ -582,7 +585,7 @@ app.get('/api/mentor/analytics', authenticateToken, requireRole('mentor'), async
 const start = async () => {
   await initDatabase();
   app.listen(PORT, () => {
-    console.log(`LumionaFlow Backend service running on http://localhost:${PORT}`);
+    console.log(`LumionaFlow Backend service running on ${import.meta.env.VITE_BACKEND_URL}`);
   });
 };
 

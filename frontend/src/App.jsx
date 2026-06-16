@@ -7,7 +7,7 @@ import StudentOnboarding from './pages/StudentOnboarding.jsx';
 import AboutProject from './pages/AboutProject.jsx';
 import { Loader2, Sparkles } from 'lucide-react';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || `${import.meta.env.VITE_BACKEND_URL}`;
 
 export default function App() {
   const [page, setPage] = useState('landing'); // 'landing' | 'auth' | 'student-onboarding' | 'student-dashboard' | 'mentor-dashboard' | 'about-project'
@@ -42,7 +42,7 @@ export default function App() {
           }
         });
         const data = await res.json();
-        
+
         if (res.ok) {
           setUser(data);
           if (data.role === 'mentor') {
@@ -74,7 +74,7 @@ export default function App() {
     localStorage.setItem('lumina_token', newToken);
     setToken(newToken);
     setUser(newUser);
-    
+
     if (newUser.role === 'mentor') {
       setPage('mentor-dashboard');
     } else {

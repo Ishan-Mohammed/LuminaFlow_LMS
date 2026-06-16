@@ -1,6 +1,6 @@
 import { initDatabase, dbGet, dbRun, dbAll } from './backend/src/db.js';
 
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = `${import.meta.env.VITE_BACKEND_URL}`;
 
 async function runTest() {
   console.log('=== STARTING PROGRAMMATIC E2E INTEGRATION TEST ===');
