@@ -1,0 +1,405 @@
+import React, { useMemo } from 'react';
+import { Sparkles, Award, ArrowRight, Zap, ShieldCheck, Layers, Star, ChevronRight, Play } from 'lucide-react';
+
+// Deterministic particle data (no random on render)
+const PARTICLES = Array.from({ length: 55 }, (_, i) => ({
+  id: i,
+  left: `${((i * 37 + 13) % 92) + 4}%`,
+  size: (i % 3) + 2,
+  duration: `${14 + (i % 10)}s`,
+  delay: `-${(i * 1.3) % 12}s`,
+  opacity: 0.12 + (i % 5) * 0.04,
+  color: i % 3 === 0 ? '#7C3AED' : i % 3 === 1 ? '#06B6D4' : '#312E81',
+}));
+
+const FEATURES = [
+  {
+    icon: Layers,
+    color: 'purple',
+    iconBg: 'bg-purple-electric/10 border-purple-electric/20 text-purple-electric',
+    title: 'Personal Learning Journals',
+    description: 'Study notes rendered in clean serif notebooks, free from dashboard clutter. Your own Notion-style learning space.',
+  },
+  {
+    icon: ShieldCheck,
+    color: 'cyan',
+    iconBg: 'bg-cyan-accent/10 border-cyan-accent/20 text-cyan-accent',
+    title: 'Intelligent Competency Gates',
+    description: 'Every module is locked behind a scored checkpoint. Pass with ≥70% to unlock the next milestone automatically.',
+  },
+  {
+    icon: Award,
+    color: 'gold',
+    iconBg: 'bg-gold-brand/10 border-gold-brand/20 text-gold-brand',
+    title: 'Verified Digital Credentials',
+    description: 'Complete all milestones, earn mentor approval, and receive a cryptographically signed certificate instantly.',
+  },
+];
+
+const STATS = [
+  { value: '98.4%', label: 'Checkpoint Pass Rate', color: 'text-purple-electric' },
+  { value: '12,500+', label: 'Active Learning Journals', color: 'text-cyan-accent' },
+  { value: '1,400+', label: 'Mentor Approvals', color: 'text-gold-brand' },
+  { value: '4.92 / 5', label: 'Student Rating', color: 'text-purple-400' },
+];
+
+const TESTIMONIALS = [
+  {
+    quote: '"The checkpoint system is genuinely transformative. You can\'t move forward without proving you understand. That\'s the accountability I needed."',
+    name: 'Tyler Brown',
+    title: 'Engineer, Vercel',
+    initials: 'TB',
+    bg: 'from-purple-electric/30 to-indigo-deep/30',
+  },
+  {
+    quote: '"As a mentor, the command console is incredibly fast. Analytics, student rosters, and project reviews all in one premium interface."',
+    name: 'Dr. Lisa Miller',
+    title: 'Curriculum Lead',
+    initials: 'LM',
+    bg: 'from-cyan-accent/30 to-purple-electric/30',
+  },
+  {
+    quote: '"The quiz gates are beautifully structured. If you fail, you see your exact score and the module notes again immediately. That feedback loop is powerful."',
+    name: 'Anna Chen',
+    title: 'Developer, Stripe',
+    initials: 'AC',
+    bg: 'from-gold-brand/30 to-cyan-accent/30',
+  },
+];
+
+export default function LandingPage({ onNavigate, isAuthenticated, user }) {
+  const scrollToSection = (id) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  return (
+    <div className="relative min-h-screen text-slate-200" style={{ backgroundColor: '#070B14' }}>
+
+      {/* ── Particle Field ──────────────────────────────────────── */}
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        {PARTICLES.map((p) => (
+          <div
+            key={p.id}
+            className="particle animate-particle"
+            style={{
+              left: p.left,
+              bottom: '-10px',
+              width: `${p.size}px`,
+              height: `${p.size}px`,
+              backgroundColor: p.color,
+              opacity: p.opacity,
+              animationDuration: p.duration,
+              animationDelay: p.delay,
+              boxShadow: `0 0 ${p.size * 3}px ${p.color}`,
+            }}
+          />
+        ))}
+        {/* Gradient Mesh */}
+        <div className="absolute -top-1/4 -left-1/4 w-[60vw] h-[60vw] rounded-full opacity-20 animate-float"
+          style={{ background: 'radial-gradient(circle, #312E81 0%, transparent 65%)', filter: 'blur(120px)' }} />
+        <div className="absolute -bottom-1/4 -right-1/4 w-[55vw] h-[55vw] rounded-full opacity-15 animate-float-slow"
+          style={{ background: 'radial-gradient(circle, #7C3AED 0%, transparent 65%)', filter: 'blur(120px)' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40vw] h-[40vw] rounded-full opacity-10 animate-float"
+          style={{ background: 'radial-gradient(circle, #06B6D4 0%, transparent 65%)', filter: 'blur(100px)', animationDelay: '3s' }} />
+      </div>
+
+      {/* ── Floating Nav ────────────────────────────────────────── */}
+      <header className="fixed top-5 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-5xl">
+        <nav className="flex items-center justify-between px-5 py-3 rounded-2xl border"
+          style={{
+            background: 'rgba(13, 17, 23, 0.8)',
+            backdropFilter: 'blur(20px)',
+            borderColor: 'rgba(255,255,255,0.08)',
+            boxShadow: '0 4px 30px rgba(0,0,0,0.5)',
+          }}>
+          <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => onNavigate('landing')}>
+            <div className="p-2 rounded-xl" style={{ background: 'linear-gradient(135deg, #7C3AED, #06B6D4)' }}>
+              <Sparkles className="h-4 w-4 text-white" />
+            </div>
+            <span className="font-bold text-sm tracking-tight text-white" style={{ fontFamily: 'Space Grotesk' }}>
+              LumionaFlow
+            </span>
+          </div>
+
+          <div className="hidden md:flex items-center gap-7 text-xs font-medium text-slate-400">
+            <button onClick={() => scrollToSection('features')} className="hover:text-cyan-400 transition-colors">Features</button>
+            <button onClick={() => scrollToSection('stats')} className="hover:text-cyan-400 transition-colors">Impact</button>
+            <button onClick={() => scrollToSection('testimonials')} className="hover:text-cyan-400 transition-colors">Stories</button>
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            {isAuthenticated ? (
+              <button
+                onClick={() => onNavigate(user?.role === 'mentor' ? 'mentor-dashboard' : 'student-dashboard')}
+                className="text-xs font-bold px-4 py-2 rounded-xl text-white transition-all active:scale-[0.97]"
+                style={{ background: 'linear-gradient(135deg, #7C3AED, #06B6D4)' }}>
+                Go to Dashboard
+              </button>
+            ) : (
+              <>
+                <button onClick={() => onNavigate('auth')}
+                  className="text-xs font-semibold text-slate-400 hover:text-white px-3 py-2 transition-colors">
+                  Sign In
+                </button>
+                <button onClick={() => onNavigate('auth')}
+                  className="text-xs font-bold px-4 py-2 rounded-xl text-white transition-all active:scale-[0.97]"
+                  style={{ background: 'linear-gradient(135deg, #7C3AED, #06B6D4)', boxShadow: '0 0 20px rgba(124,58,237,0.3)' }}>
+                  Get Started
+                </button>
+              </>
+            )}
+          </div>
+        </nav>
+      </header>
+
+      {/* ── Hero Section ────────────────────────────────────────── */}
+      <section className="relative z-10 min-h-screen flex flex-col items-center justify-center pt-28 pb-20 px-6 text-center overflow-hidden">
+
+        {/* Badge pill */}
+        <div className="animate-fade-slide-up opacity-0 inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-8"
+          style={{
+            background: 'rgba(124,58,237,0.1)',
+            border: '1px solid rgba(124,58,237,0.3)',
+            color: '#A78BFA',
+            animationFillMode: 'forwards',
+          }}>
+          <Zap className="h-3 w-3" />
+          AI-Powered Learning Automation Engine
+          <ChevronRight className="h-3 w-3" />
+        </div>
+
+        {/* Main heading */}
+        <h1 className="animate-fade-slide-up opacity-0 delay-200 font-bold tracking-tight leading-none max-w-4xl"
+          style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', fontFamily: 'Space Grotesk', animationFillMode: 'forwards' }}>
+          <span className="text-white">LUMIONA</span>
+          <span className="gradient-text">FLOW</span>
+        </h1>
+
+        <p className="animate-fade-slide-up opacity-0 delay-400 mt-6 text-xl md:text-2xl font-light text-slate-400 max-w-2xl leading-relaxed"
+          style={{ animationFillMode: 'forwards' }}>
+          Transforming Learning Through{' '}
+          <span className="gradient-text-cyan font-semibold">Intelligent Automation</span>
+        </p>
+
+        <p className="animate-fade-slide-up opacity-0 delay-500 mt-4 text-sm text-slate-500 max-w-xl leading-relaxed"
+          style={{ animationFillMode: 'forwards' }}>
+          Automate learning journeys, unlock progress gates, receive mentor reviews, and earn verified credentials through a structured, intelligent workflow.
+        </p>
+
+        {/* CTAs */}
+        <div className="animate-fade-slide-up opacity-0 delay-700 mt-10 flex flex-col sm:flex-row gap-4 items-center justify-center"
+          style={{ animationFillMode: 'forwards' }}>
+          <button onClick={() => onNavigate('auth')}
+            className="group flex items-center gap-2.5 px-8 py-4 rounded-2xl text-sm font-bold text-white transition-all active:scale-[0.97]"
+            style={{
+              background: 'linear-gradient(135deg, #7C3AED 0%, #06B6D4 100%)',
+              boxShadow: '0 0 30px rgba(124,58,237,0.4), 0 4px 20px rgba(0,0,0,0.3)',
+            }}>
+            Start Your Learning Journey
+            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+          </button>
+          <button onClick={() => scrollToSection('features')}
+            className="flex items-center gap-2 px-6 py-4 rounded-2xl text-sm font-semibold text-slate-300 transition-all hover:text-white"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <Play className="h-3.5 w-3.5 text-cyan-400" />
+            See How It Works
+          </button>
+        </div>
+
+        {/* Dashboard Preview Frame */}
+        <div className="animate-fade-slide-up opacity-0 delay-1000 mt-20 w-full max-w-5xl"
+          style={{ animationFillMode: 'forwards' }}>
+          <div className="relative rounded-3xl p-[1px]"
+            style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.4), rgba(6,182,212,0.4), rgba(255,255,255,0.05))' }}>
+            <div className="rounded-3xl overflow-hidden"
+              style={{ background: '#0D1117', border: '1px solid rgba(255,255,255,0.04)', aspectRatio: '16/9' }}>
+              {/* Window bar */}
+              <div className="flex items-center justify-between px-5 py-3.5 border-b" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }} />
+                  <div className="w-3 h-3 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                  <div className="w-3 h-3 rounded-full" style={{ background: 'rgba(255,255,255,0.04)' }} />
+                </div>
+                <div className="h-5 w-44 rounded-lg" style={{ background: 'rgba(255,255,255,0.04)' }} />
+                <div className="w-6 h-6 rounded-full" style={{ background: 'rgba(124,58,237,0.2)' }} />
+              </div>
+              {/* Mock UI */}
+              <div className="flex-1 p-8 grid grid-cols-12 gap-5 h-[calc(100%-52px)]">
+                <div className="col-span-3 flex flex-col gap-4">
+                  <div className="h-3 w-20 rounded" style={{ background: 'rgba(124,58,237,0.3)' }} />
+                  <div className="flex flex-col gap-3 pl-3 border-l" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+                    {[1, 2, 3, 4].map((m) => (
+                      <div key={m} className="flex items-center gap-2.5">
+                        <div className="w-4 h-4 rounded-full shrink-0" style={{
+                          background: m === 1 ? 'rgba(124,58,237,0.8)' : m === 2 ? 'rgba(6,182,212,0.4)' : 'rgba(255,255,255,0.06)',
+                          border: m === 1 ? '2px solid rgba(124,58,237,0.6)' : 'none',
+                          marginLeft: '-10px'
+                        }} />
+                        <div className="h-2 rounded" style={{ width: `${70 - m * 8}%`, background: m <= 2 ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.05)' }} />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-2 h-1.5 w-full rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                    <div className="h-full rounded-full" style={{ width: '25%', background: 'linear-gradient(90deg, #7C3AED, #06B6D4)' }} />
+                  </div>
+                </div>
+                <div className="col-span-9 flex flex-col gap-4">
+                  <div className="grid grid-cols-3 gap-3">
+                    {['#7C3AED', '#06B6D4', '#FBBF24'].map((c, i) => (
+                      <div key={i} className="h-16 rounded-xl flex items-center justify-between p-3" style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <div>
+                          <div className="h-1.5 w-12 rounded mb-1.5" style={{ background: 'rgba(255,255,255,0.1)' }} />
+                          <div className="h-3 w-8 rounded" style={{ background: `${c}60` }} />
+                        </div>
+                        <div className="w-8 h-8 rounded-lg" style={{ background: `${c}20`, border: `1px solid ${c}30` }} />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex-1 rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div className="h-3 w-32 rounded mb-4" style={{ background: 'rgba(255,255,255,0.1)' }} />
+                    <div className="space-y-2">
+                      {[95, 80, 60].map((w, i) => (
+                        <div key={i} className="flex items-center gap-3">
+                          <div className="h-2 rounded-full" style={{ width: `${w}%`, background: i === 0 ? 'rgba(124,58,237,0.5)' : 'rgba(255,255,255,0.06)' }} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Features Section ────────────────────────────────────── */}
+      <section id="features" className="relative z-10 py-28 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-20">
+            <p className="section-label mb-4">Platform Methodology</p>
+            <h2 className="text-4xl md:text-5xl font-bold text-white max-w-2xl mx-auto" style={{ fontFamily: 'Space Grotesk' }}>
+              Built for{' '}
+              <span className="gradient-text">serious learners</span>
+            </h2>
+            <p className="mt-5 text-slate-400 text-base max-w-lg mx-auto leading-relaxed">
+              We replace passive content catalogs with structured pathfinding maps that verify real competencies.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {FEATURES.map((f, i) => {
+              const Icon = f.icon;
+              return (
+                <div key={i} className="group glass-panel glass-panel-hover rounded-3xl p-8 transition-all duration-300">
+                  <div className={`w-12 h-12 rounded-2xl ${f.iconBg} border flex items-center justify-center mb-6 transition-all group-hover:scale-110`}>
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-3">{f.title}</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">{f.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Stats Section ────────────────────────────────────────── */}
+      <section id="stats" className="relative z-10 py-20 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="glass-panel rounded-3xl p-10 md:p-14">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-10 text-center">
+              {STATS.map((s, i) => (
+                <div key={i}>
+                  <div className={`text-4xl md:text-5xl font-black ${s.color}`} style={{ fontFamily: 'Space Grotesk' }}>
+                    {s.value}
+                  </div>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mt-3">{s.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Testimonials Section ─────────────────────────────────── */}
+      <section id="testimonials" className="relative z-10 py-28 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-20">
+            <p className="section-label mb-4">Student Stories</p>
+            <h2 className="text-4xl md:text-5xl font-bold text-white" style={{ fontFamily: 'Space Grotesk' }}>
+              Learners who{' '}
+              <span className="gradient-text-cyan">transformed</span>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {TESTIMONIALS.map((t, i) => (
+              <div key={i} className="glass-panel glass-panel-hover rounded-3xl p-7 flex flex-col justify-between transition-all duration-300">
+                <div>
+                  <div className="flex gap-1 mb-5">
+                    {[...Array(5)].map((_, j) => (
+                      <Star key={j} className="h-3.5 w-3.5 fill-gold-brand text-gold-brand" />
+                    ))}
+                  </div>
+                  <p className="text-sm text-slate-300 leading-relaxed italic font-serif">{t.quote}</p>
+                </div>
+                <div className="flex items-center gap-3 mt-7 pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                  <div className={`w-9 h-9 rounded-full bg-gradient-to-tr ${t.bg} flex items-center justify-center text-xs font-bold text-white shrink-0`}>
+                    {t.initials}
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-white">{t.name}</div>
+                    <div className="text-[10px] text-slate-500">{t.title}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA Banner ───────────────────────────────────────────── */}
+      <section className="relative z-10 py-20 px-6">
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="glass-panel rounded-3xl p-14" style={{ background: 'rgba(124,58,237,0.06)', borderColor: 'rgba(124,58,237,0.2)' }}>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-5" style={{ fontFamily: 'Space Grotesk' }}>
+              Ready to begin your<br />
+              <span className="gradient-text">learning journey?</span>
+            </h2>
+            <p className="text-slate-400 text-base mb-10 max-w-md mx-auto leading-relaxed">
+              Join thousands of learners on an intelligent, automated path to mastery.
+            </p>
+            <button onClick={() => onNavigate('auth')}
+              className="group inline-flex items-center gap-3 px-10 py-4 rounded-2xl text-sm font-bold text-white transition-all active:scale-[0.97]"
+              style={{
+                background: 'linear-gradient(135deg, #7C3AED 0%, #06B6D4 100%)',
+                boxShadow: '0 0 40px rgba(124,58,237,0.4)',
+              }}>
+              Start Your Learning Journey
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Footer ───────────────────────────────────────────────── */}
+      <footer className="relative z-10 py-10 px-6" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-5">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded-lg" style={{ background: 'linear-gradient(135deg, #7C3AED, #06B6D4)' }}>
+              <Sparkles className="h-3.5 w-3.5 text-white" />
+            </div>
+            <span className="font-bold text-sm text-white tracking-tight" style={{ fontFamily: 'Space Grotesk' }}>LumionaFlow</span>
+          </div>
+          <div className="flex gap-6 text-xs font-semibold uppercase tracking-wider text-slate-600">
+            <span className="hover:text-slate-400 cursor-pointer transition-colors">Terms</span>
+            <span className="hover:text-slate-400 cursor-pointer transition-colors">Privacy</span>
+            <span className="hover:text-slate-400 cursor-pointer transition-colors">Support</span>
+          </div>
+          <p className="text-xs text-slate-700">© {new Date().getFullYear()} LumionaFlow. All rights reserved.</p>
+        </div>
+      </footer>
+
+    </div>
+  );
+}
