@@ -23,7 +23,17 @@ app.use(express.json());
 
 // Auth Endpoints
 app.post('/api/auth/signup', registerUser);
-app.post('/api/auth/login', loginUser);
+fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(data)
+})
+  .then(res => {
+    if (!res.ok) throw new Error("API failed");
+    return res.json();
+  })
 app.get('/api/auth/me', authenticateToken, getMe);
 
 // Dedicated Mentor Login Endpoint
