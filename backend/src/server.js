@@ -23,17 +23,7 @@ app.use(express.json());
 
 // Auth Endpoints
 app.post('/api/auth/signup', registerUser);
-fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify(data)
-})
-  .then(res => {
-    if (!res.ok) throw new Error("API failed");
-    return res.json();
-  })
+app.post('/api/auth/login', loginUser);
 app.get('/api/auth/me', authenticateToken, getMe);
 
 // Dedicated Mentor Login Endpoint
@@ -595,7 +585,7 @@ app.get('/api/mentor/analytics', authenticateToken, requireRole('mentor'), async
 const start = async () => {
   await initDatabase();
   app.listen(PORT, () => {
-    console.log(`LumionaFlow Backend service running on ${import.meta.env.VITE_BACKEND_URL}`);
+    console.log(`LumionaFlow Backend service running on http://localhost:${PORT}`);
   });
 };
 

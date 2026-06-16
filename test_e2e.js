@@ -1,6 +1,6 @@
 import { initDatabase, dbGet, dbRun, dbAll } from './backend/src/db.js';
 
-const BACKEND_URL = `${import.meta.env.VITE_BACKEND_URL}`;
+const BACKEND_URL = 'http://localhost:5000';
 
 async function runTest() {
   console.log('=== STARTING PROGRAMMATIC E2E INTEGRATION TEST ===');
@@ -27,7 +27,7 @@ async function runTest() {
 
   // 2. Log in student
   console.log('\n[2] Logging in student...');
-  const loginRes = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`, {
+  const loginRes = await fetch(`${BACKEND_URL}/api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email: studentEmail, password })
