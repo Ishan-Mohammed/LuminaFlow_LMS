@@ -118,13 +118,27 @@ export default function StudentDashboard({ token, user, onLogout, backendUrl, th
   const strokeDashoffset = circumference - (progressPercent / 100) * circumference;
 
   // ── API Calls (unchanged) ──────────────────────────────────────
+  const apiFetch = async (endpoint, options = {}) => {
+    const url = `${import.meta.env.VITE_BACKEND_URL}${endpoint}`;
+    const headers = {
+      'Authorization': `Bearer ${token}`,
+      ...options.headers,
+    };
+    const res = await fetch(url, { ...options, headers });
+    const contentType = res.headers.get('content-type') || '';
+    const isJson = contentType.includes('application/json');
+    const data = isJson ? await res.json() : null;
+
+    if (!res.ok) {
+      const errorMsg = (data && data.error) || `Server error (${res.status})`;
+      throw new Error(errorMsg);
+    }
+    return data;
+  };
+
   const fetchRoadmap = async () => {
     try {
-      const res = await fetch(`${backendUrl}/api/student/roadmap`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to load progress roadmap.');
+      const data = await apiFetch('/api/student/roadmap');
       setRoadmap(data.roadmap || []);
       if (data.selectedLevel) {
         setActiveLevel(data.selectedLevel);
@@ -143,24 +157,23 @@ export default function StudentDashboard({ token, user, onLogout, backendUrl, th
     setError('');
     setLoadingRoadmap(true);
     try {
-      const res = await fetch(`${backendUrl}/api/student/select-level`, {
+      await apiFetch('/api/student/select-level', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ bootcampLevel: newLvl }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to switch level');
       user.selected_bootcamp_level = newLvl;
       setActiveLevel(newLvl);
       setActiveModuleId('');
       setActiveModuleDetails(null);
       await fetchRoadmap();
       // Fetch certificates mapping for this new level
-      const certRes = await fetch(`${backendUrl}/api/student/certificate`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const certData = await certRes.json();
-      setCertificate(certRes.ok ? certData : null);
+      try {
+        const certData = await apiFetch('/api/student/certificate');
+        setCertificate(certData);
+      } catch (certErr) {
+        setCertificate(null);
+      }
     } catch (err) {
       setError(err.message);
       setLoadingRoadmap(false);
@@ -171,11 +184,7 @@ export default function StudentDashboard({ token, user, onLogout, backendUrl, th
     if (!id) return;
     setLoadingModule(true); setError('');
     try {
-      const res = await fetch(`${backendUrl}/api/student/module/${id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to load module details.');
+      const data = await apiFetch(`/api/student/module/${id}`);
       setActiveModuleDetails(data);
     } catch (err) { setError(err.message); setActiveModuleDetails(null); }
     finally { setLoadingModule(false); }
@@ -183,21 +192,15 @@ export default function StudentDashboard({ token, user, onLogout, backendUrl, th
 
   const fetchProjectStatus = async () => {
     try {
-      const res = await fetch(`${backendUrl}/api/student/project`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (res.ok && data) setProject(data);
+      const data = await apiFetch('/api/student/project');
+      if (data) setProject(data);
     } catch (err) { console.error('Project query error:', err); }
   };
 
   const fetchCertificate = async () => {
     try {
-      const res = await fetch(`${backendUrl}/api/student/certificate`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (res.ok) setCertificate(data);
+      const data = await apiFetch('/api/student/certificate');
+      if (data) setCertificate(data);
     } catch (err) { console.error('Certificate query error:', err); }
   };
 
@@ -209,13 +212,11 @@ export default function StudentDashboard({ token, user, onLogout, backendUrl, th
     if (!newProjectTitle.trim() || !newProjectDesc.trim()) { setError('Please fill out project title and description.'); return; }
     setSubmittingProject(true); setError('');
     try {
-      const res = await fetch(`${backendUrl}/api/student/project`, {
+      await apiFetch('/api/student/project', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: newProjectTitle, description: newProjectDesc, githubLink, fileName }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Project submission failed');
       setProject({ title: newProjectTitle, description: newProjectDesc, github_link: githubLink, file_path: fileName, status: 'pending' });
       setNewProjectTitle(''); setNewProjectDesc(''); setGithubLink(''); setFileName('');
     } catch (err) { setError(err.message); }
@@ -225,11 +226,7 @@ export default function StudentDashboard({ token, user, onLogout, backendUrl, th
   const handleStartQuiz = async () => {
     setError('');
     try {
-      const res = await fetch(`${backendUrl}/api/student/quiz/${activeModuleId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to retrieve quiz');
+      const data = await apiFetch(`/api/student/quiz/${activeModuleId}`);
       setQuizData(data); setQuizAnswers({}); setQuizResult(null); setShowQuizModal(true);
     } catch (err) { setError(err.message); }
   };
@@ -239,13 +236,11 @@ export default function StudentDashboard({ token, user, onLogout, backendUrl, th
     const answersArray = [];
     for (let i = 0; i < totalQuestions; i++) answersArray.push(quizAnswers[i] !== undefined ? quizAnswers[i] : -1);
     try {
-      const res = await fetch(`${backendUrl}/api/student/quiz/${activeModuleId}/submit`, {
+      const data = await apiFetch(`/api/student/quiz/${activeModuleId}/submit`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ answers: answersArray }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to grade assessment');
       setQuizResult(data); fetchRoadmap(); fetchCertificate();
     } catch (err) { setError(err.message); }
   };
@@ -963,13 +958,11 @@ export default function StudentDashboard({ token, user, onLogout, backendUrl, th
                                 onClick={async () => {
                                   setError('');
                                   try {
-                                    const res = await fetch(`${backendUrl}/api/student/select-course`, {
+                                    await apiFetch('/api/student/select-course', {
                                       method: 'POST',
-                                      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                                      headers: { 'Content-Type': 'application/json' },
                                       body: JSON.stringify({ courseId: track.id })
                                     });
-                                    const data = await res.json();
-                                    if (!res.ok) throw new Error(data.error || 'Failed to select course');
                                     user.selected_course_id = track.id; // update local session
                                     setActiveModuleId('');
                                     setActiveModuleDetails(null);

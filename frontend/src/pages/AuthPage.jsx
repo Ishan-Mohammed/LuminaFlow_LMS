@@ -52,13 +52,17 @@ export default function AuthPage({ onNavigate, onAuthSuccess, backendUrl }) {
         payload = { name, email, password, role: 'student' };
       }
 
-      const response = await fetch(`${backendUrl}${endpoint}`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
+      // Safely read response — guard against HTML error pages (Render cold-start, 503s)
+      const contentType = response.headers.get('content-type') || '';
+      const isJson = contentType.includes('application/json');
+      const data = isJson ? await response.json() : { error: `Server error (${response.status}). Please wait a moment and try again.` };
+
       if (!response.ok) throw new Error(data.error || 'Authentication failed');
 
       setSuccess(

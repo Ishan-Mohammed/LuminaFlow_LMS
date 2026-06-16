@@ -16,10 +16,19 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: "*",
-  credentials: true
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
 }));
+app.options('*', cors()); // Handle preflight for all routes
 app.use(express.json());
+// Handle JSON parsing syntax errors (prevent returning HTML error pages)
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ error: 'Invalid JSON payload' });
+  }
+  next(err);
+});
 
 // Auth Endpoints
 app.post('/api/auth/signup', registerUser);
@@ -579,6 +588,17 @@ app.get('/api/mentor/analytics', authenticateToken, requireRole('mentor'), async
     console.error('Error fetching analytics:', err);
     res.status(500).json({ error: 'Failed to load mentor telemetry metrics' });
   }
+});
+
+// Catch-all: unknown API routes always return JSON (never HTML)
+app.use((req, res) => {
+  res.status(404).json({ error: `Route not found: ${req.method} ${req.originalUrl}` });
+});
+
+// Global error handler — always returns JSON, never HTML stack traces
+app.use((err, req, res, next) => {
+  console.error('Unhandled server error:', err);
+  res.status(500).json({ error: 'Internal server error', message: err.message });
 });
 
 // Initialize database schema and seed data, then start the server

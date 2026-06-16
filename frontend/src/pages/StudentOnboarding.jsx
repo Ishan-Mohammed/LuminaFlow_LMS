@@ -76,12 +76,14 @@ export default function StudentOnboarding({ token, onOnboardingComplete, backend
     setError('');
 
     try {
-      const res = await fetch(`${backendUrl}/api/student/select-course`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/student/select-course`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ courseId: selectedTrack, bootcampLevel: selectedLevel }),
       });
-      const data = await res.json();
+      const contentType = res.headers.get('content-type') || '';
+      const isJson = contentType.includes('application/json');
+      const data = isJson ? await res.json() : { error: `Server error (${res.status})` };
       if (!res.ok) throw new Error(data.error || 'Failed to register selected course.');
       onOnboardingComplete(selectedTrack, selectedLevel);
     } catch (err) {

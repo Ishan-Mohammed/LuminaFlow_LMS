@@ -7,7 +7,7 @@ import StudentOnboarding from './pages/StudentOnboarding.jsx';
 import AboutProject from './pages/AboutProject.jsx';
 import { Loader2, Sparkles } from 'lucide-react';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export default function App() {
   const [page, setPage] = useState('landing'); // 'landing' | 'auth' | 'student-onboarding' | 'student-dashboard' | 'mentor-dashboard' | 'about-project'
@@ -36,28 +36,29 @@ export default function App() {
         return;
       }
       try {
-        const res = await fetch(`${BACKEND_URL}/api/auth/me`, {
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/me`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-        const data = await res.json();
 
-        if (res.ok) {
-          setUser(data);
-          if (data.role === 'mentor') {
-            setPage('mentor-dashboard');
-          } else {
-            // Check if student has finished onboarding / course selection
-            if (data.selected_course_id) {
-              setPage('student-dashboard');
-            } else {
-              setPage('student-onboarding');
-            }
-          }
-        } else {
-          // Token expired or invalid, sign out
+        // Guard: always check res.ok before parsing JSON — prevents "Unexpected token" crashes
+        // when server returns an HTML error page (e.g. cold-start 503, nginx error)
+        if (!res.ok) {
           handleLogout();
+          return;
+        }
+
+        const data = await res.json();
+        setUser(data);
+        if (data.role === 'mentor') {
+          setPage('mentor-dashboard');
+        } else {
+          if (data.selected_course_id) {
+            setPage('student-dashboard');
+          } else {
+            setPage('student-onboarding');
+          }
         }
       } catch (err) {
         console.error('Session verification failed:', err);

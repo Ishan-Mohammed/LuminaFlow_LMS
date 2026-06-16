@@ -14,21 +14,32 @@ export default function MentorDashboard({ token, user, onLogout, backendUrl, the
   const [activeStudentDetail, setActiveStudentDetail] = useState(null);
 
   // ── API Calls (unchanged) ──────────────────────────────────────
+  const apiFetch = async (endpoint, options = {}) => {
+    const url = `${import.meta.env.VITE_BACKEND_URL}${endpoint}`;
+    const headers = {
+      'Authorization': `Bearer ${token}`,
+      ...options.headers,
+    };
+    const res = await fetch(url, { ...options, headers });
+    const contentType = res.headers.get('content-type') || '';
+    const isJson = contentType.includes('application/json');
+    const data = isJson ? await res.json() : null;
+
+    if (!res.ok) {
+      const errorMsg = (data && data.error) || `Server error (${res.status})`;
+      throw new Error(errorMsg);
+    }
+    return data;
+  };
+
   const fetchData = async () => {
     setLoading(true); setError('');
     try {
-      const headers = { 'Authorization': `Bearer ${token}` };
-      const [studentsRes, submissionsRes, analyticsRes] = await Promise.all([
-        fetch(`${backendUrl}/api/mentor/students`, { headers }),
-        fetch(`${backendUrl}/api/mentor/submissions`, { headers }),
-        fetch(`${backendUrl}/api/mentor/analytics`, { headers }),
+      const [studentsData, submissionsData, analyticsData] = await Promise.all([
+        apiFetch('/api/mentor/students'),
+        apiFetch('/api/mentor/submissions'),
+        apiFetch('/api/mentor/analytics'),
       ]);
-      const studentsData = await studentsRes.json();
-      const submissionsData = await submissionsRes.json();
-      const analyticsData = await analyticsRes.json();
-      if (!studentsRes.ok) throw new Error(studentsData.error || 'Failed to fetch students');
-      if (!submissionsRes.ok) throw new Error(submissionsData.error || 'Failed to fetch submissions');
-      if (!analyticsRes.ok) throw new Error(analyticsData.error || 'Failed to fetch analytics');
       setStudents(studentsData);
       setSubmissions(submissionsData);
       setAnalytics(analyticsData);
@@ -49,13 +60,11 @@ export default function MentorDashboard({ token, user, onLogout, backendUrl, the
     if (status === 'rejected' && !feedback.trim()) { setError('Please provide feedback explaining what revisions are required.'); return; }
     setReviewingId(submissionId); setError('');
     try {
-      const res = await fetch(`${backendUrl}/api/mentor/submissions/${submissionId}/review`, {
+      await apiFetch(`/api/mentor/submissions/${submissionId}/review`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status, feedback }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Review failed.');
       setFeedbackMap({ ...feedbackMap, [submissionId]: '' });
       await fetchData();
     } catch (err) { setError(err.message); }
