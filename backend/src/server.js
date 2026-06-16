@@ -51,6 +51,7 @@ app.use((err, req, res, next) => {
 // Auth Endpoints
 app.post('/api/auth/signup', registerUser);
 app.post('/api/auth/login', loginUser);
+app.post('/api/auth/login', loginUser);
 app.get('/api/auth/me', authenticateToken, getMe);
 
 // Dedicated Mentor Login Endpoint
