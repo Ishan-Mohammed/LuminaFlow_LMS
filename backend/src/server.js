@@ -7,7 +7,7 @@ import bcrypt from 'bcryptjs';
 import { initDatabase, dbGet, dbRun, dbAll } from './db.js';
 import { registerUser, loginUser, getMe, authenticateToken, requireRole } from './auth.js';
 import { validateAssessment, verifyCourseCompletion } from './automation.js';
-export default app;
+
 
 dotenv.config();
 
@@ -587,3 +587,6 @@ const start = async () => {
 };
 
 start();
+
+// Export for Vercel serverless
+export default app;
