@@ -5,7 +5,7 @@ import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { initDatabase, dbGet, dbRun, dbAll } from './db.js';
-import { registerUser, loginUser, getMe, authenticateToken, requireRole } from './auth.js';
+import { registerUser, loginUser, getMe, authenticateToken, requireRole, JWT_SECRET } from './auth.js';
 import { validateAssessment, verifyCourseCompletion } from './automation.js';
 
 
@@ -22,6 +22,24 @@ app.use(cors({
 }));
 app.options('*', cors()); // Handle preflight for all routes
 app.use(express.json());
+
+// Standardize error payloads middleware: decorate all error responses with success: false and message properties
+app.use((req, res, next) => {
+  const originalJson = res.json;
+  res.json = function (obj) {
+    if (obj && typeof obj === 'object') {
+      if ('error' in obj && !('success' in obj)) {
+        obj.success = false;
+        if (!('message' in obj)) {
+          obj.message = obj.error;
+        }
+      }
+    }
+    return originalJson.call(this, obj);
+  };
+  next();
+});
+
 // Handle JSON parsing syntax errors (prevent returning HTML error pages)
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
@@ -42,8 +60,6 @@ app.post('/api/auth/mentor-login', async (req, res) => {
     if (!name || !password) {
       return res.status(400).json({ error: 'Mentor Name and password are required.' });
     }
-
-    const JWT_SECRET = process.env.JWT_SECRET || 'LUMINAFLOW_SUPER_SECRET_KEY_123';
 
     if (password !== '123456') {
       // Check if mentor exists and check password

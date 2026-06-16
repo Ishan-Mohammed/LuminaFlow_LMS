@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { dbGet, dbRun, dbAll } from './db.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'LUMINAFLOW_SUPER_SECRET_KEY_123';
+export const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
 
 // Middleware to authenticate JWT
 export const authenticateToken = (req, res, next) => {
@@ -11,12 +11,20 @@ export const authenticateToken = (req, res, next) => {
   const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
 
   if (!token) {
-    return res.status(401).json({ error: 'Access token is required' });
+    return res.status(401).json({
+      success: false,
+      message: 'Access token is required',
+      error: 'Access token is required'
+    });
   }
 
   jwt.verify(token, JWT_SECRET, (err, decodedUser) => {
     if (err) {
-      return res.status(403).json({ error: 'Invalid or expired token' });
+      return res.status(403).json({
+        success: false,
+        message: 'Invalid or expired token',
+        error: 'Invalid or expired token'
+      });
     }
     req.user = decodedUser;
     next();
@@ -27,7 +35,12 @@ export const authenticateToken = (req, res, next) => {
 export const requireRole = (role) => {
   return (req, res, next) => {
     if (!req.user || req.user.role !== role) {
-      return res.status(403).json({ error: `Forbidden: Requires ${role} role` });
+      const errMsg = `Forbidden: Requires ${role} role`;
+      return res.status(403).json({
+        success: false,
+        message: errMsg,
+        error: errMsg
+      });
     }
     next();
   };
@@ -39,17 +52,32 @@ export const registerUser = async (req, res) => {
     const { name, email, password, role } = req.body;
 
     if (!name || !email || !password || !role) {
-      return res.status(400).json({ error: 'All fields are required (name, email, password, role)' });
+      const errMsg = 'All fields are required (name, email, password, role)';
+      return res.status(400).json({
+        success: false,
+        message: errMsg,
+        error: errMsg
+      });
     }
 
     if (role !== 'student' && role !== 'mentor') {
-      return res.status(400).json({ error: 'Invalid role. Must be either student or mentor' });
+      const errMsg = 'Invalid role. Must be either student or mentor';
+      return res.status(400).json({
+        success: false,
+        message: errMsg,
+        error: errMsg
+      });
     }
 
     // Check if user already exists
     const existingUser = await dbGet('SELECT * FROM users WHERE email = ?', [email]);
     if (existingUser) {
-      return res.status(400).json({ error: 'An account with this email already exists' });
+      const errMsg = 'An account with this email already exists';
+      return res.status(400).json({
+        success: false,
+        message: errMsg,
+        error: errMsg
+      });
     }
 
     // Hash password
@@ -75,7 +103,11 @@ export const registerUser = async (req, res) => {
 
   } catch (err) {
     console.error('Registration error:', err);
-    res.status(500).json({ error: 'Server error during registration' });
+    res.status(500).json({
+      success: false,
+      message: 'Server error during registration',
+      error: 'Server error during registration'
+    });
   }
 };
 
@@ -85,19 +117,34 @@ export const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+      const errMsg = 'Email and password are required';
+      return res.status(400).json({
+        success: false,
+        message: errMsg,
+        error: errMsg
+      });
     }
 
     // Find user
     const user = await dbGet('SELECT * FROM users WHERE email = ?', [email]);
     if (!user) {
-      return res.status(400).json({ error: 'Invalid email or password' });
+      const errMsg = 'Invalid email or password';
+      return res.status(400).json({
+        success: false,
+        message: errMsg,
+        error: errMsg
+      });
     }
 
     // Verify password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ error: 'Invalid email or password' });
+      const errMsg = 'Invalid email or password';
+      return res.status(400).json({
+        success: false,
+        message: errMsg,
+        error: errMsg
+      });
     }
 
     // Create token
@@ -111,7 +158,11 @@ export const loginUser = async (req, res) => {
 
   } catch (err) {
     console.error('Login error:', err);
-    res.status(500).json({ error: 'Server error during login' });
+    res.status(500).json({
+      success: false,
+      message: 'Server error during login',
+      error: 'Server error during login'
+    });
   }
 };
 
@@ -120,11 +171,20 @@ export const getMe = async (req, res) => {
   try {
     const user = await dbGet('SELECT id, name, email, role, createdAt, selected_course_id, selected_bootcamp_level FROM users WHERE id = ?', [req.user.id]);
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      const errMsg = 'User not found';
+      return res.status(404).json({
+        success: false,
+        message: errMsg,
+        error: errMsg
+      });
     }
     res.json(user);
   } catch (err) {
     console.error('Get user session error:', err);
-    res.status(500).json({ error: 'Server error retrieving session' });
+    res.status(500).json({
+      success: false,
+      message: 'Server error retrieving session',
+      error: 'Server error retrieving session'
+    });
   }
 };
