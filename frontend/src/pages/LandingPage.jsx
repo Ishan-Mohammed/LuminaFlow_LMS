@@ -224,7 +224,7 @@ export default function LandingPage({ onNavigate, isAuthenticated, user }) {
       </header>
 
       {/* ── Hero Section ────────────────────────────────────────── */}
-      <section className="relative z-10 min-h-screen flex flex-col items-center justify-center pt-28 pb-20 px-6 text-center overflow-hidden">
+      <section className="relative z-10 min-h-[80vh] flex flex-col items-center justify-center pt-36 pb-16 px-6 text-center overflow-hidden">
 
         {/* Badge pill */}
         <div className="animate-fade-slide-up opacity-0 inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-8"
@@ -282,71 +282,6 @@ export default function LandingPage({ onNavigate, isAuthenticated, user }) {
             <Play className="h-3.5 w-3.5 text-cyan-400" />
             See How It Works
           </button>
-        </div>
-
-        {/* Dashboard Preview Frame */}
-        <div className="animate-fade-slide-up opacity-0 delay-1000 mt-20 w-full max-w-5xl"
-          style={{ animationFillMode: 'forwards' }}>
-          <div className="relative rounded-3xl p-[1px]"
-            style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.4), rgba(6,182,212,0.4), rgba(255,255,255,0.05))' }}>
-            <div className="rounded-3xl overflow-hidden"
-              style={{ background: '#0D1117', border: '1px solid rgba(255,255,255,0.04)', aspectRatio: '16/9' }}>
-              {/* Window bar */}
-              <div className="flex items-center justify-between px-5 py-3.5 border-b" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }} />
-                  <div className="w-3 h-3 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }} />
-                  <div className="w-3 h-3 rounded-full" style={{ background: 'rgba(255,255,255,0.04)' }} />
-                </div>
-                <div className="h-5 w-44 rounded-lg" style={{ background: 'rgba(255,255,255,0.04)' }} />
-                <div className="w-6 h-6 rounded-full" style={{ background: 'rgba(124,58,237,0.2)' }} />
-              </div>
-              {/* Mock UI */}
-              <div className="flex-1 p-8 grid grid-cols-12 gap-5 h-[calc(100%-52px)]">
-                <div className="col-span-3 flex flex-col gap-4">
-                  <div className="h-3 w-20 rounded" style={{ background: 'rgba(124,58,237,0.3)' }} />
-                  <div className="flex flex-col gap-3 pl-3 border-l" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-                    {[1, 2, 3, 4].map((m) => (
-                      <div key={m} className="flex items-center gap-2.5">
-                        <div className="w-4 h-4 rounded-full shrink-0" style={{
-                          background: m === 1 ? 'rgba(124,58,237,0.8)' : m === 2 ? 'rgba(6,182,212,0.4)' : 'rgba(255,255,255,0.06)',
-                          border: m === 1 ? '2px solid rgba(124,58,237,0.6)' : 'none',
-                          marginLeft: '-10px'
-                        }} />
-                        <div className="h-2 rounded" style={{ width: `${70 - m * 8}%`, background: m <= 2 ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.05)' }} />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-2 h-1.5 w-full rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}>
-                    <div className="h-full rounded-full" style={{ width: '25%', background: 'linear-gradient(90deg, #7C3AED, #06B6D4)' }} />
-                  </div>
-                </div>
-                <div className="col-span-9 flex flex-col gap-4">
-                  <div className="grid grid-cols-3 gap-3">
-                    {['#7C3AED', '#06B6D4', '#FBBF24'].map((c, i) => (
-                      <div key={i} className="h-16 rounded-xl flex items-center justify-between p-3" style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                        <div>
-                          <div className="h-1.5 w-12 rounded mb-1.5" style={{ background: 'rgba(255,255,255,0.1)' }} />
-                          <div className="h-3 w-8 rounded" style={{ background: `${c}60` }} />
-                        </div>
-                        <div className="w-8 h-8 rounded-lg" style={{ background: `${c}20`, border: `1px solid ${c}30` }} />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex-1 rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                    <div className="h-3 w-32 rounded mb-4" style={{ background: 'rgba(255,255,255,0.1)' }} />
-                    <div className="space-y-2">
-                      {[95, 80, 60].map((w, i) => (
-                        <div key={i} className="flex items-center gap-3">
-                          <div className="h-2 rounded-full" style={{ width: `${w}%`, background: i === 0 ? 'rgba(124,58,237,0.5)' : 'rgba(255,255,255,0.06)' }} />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
