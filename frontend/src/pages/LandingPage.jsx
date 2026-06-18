@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Sparkles, Award, ArrowRight, Zap, ShieldCheck, Layers, Star, ChevronRight, Play } from 'lucide-react';
+import { Sparkles, Award, ArrowRight, Zap, ShieldCheck, Layers, Star, ChevronRight, Play, BookOpen, Cpu, Video, Code, Bot, Users, ClipboardCheck, Mic } from 'lucide-react';
 
 // Deterministic particle data (no random on render)
 const PARTICLES = Array.from({ length: 55 }, (_, i) => ({
@@ -36,35 +36,106 @@ const FEATURES = [
   },
 ];
 
-const STATS = [
-  { value: '98.4%', label: 'Checkpoint Pass Rate', color: 'text-purple-electric' },
-  { value: '12,500+', label: 'Active Learning Journals', color: 'text-cyan-accent' },
-  { value: '1,400+', label: 'Mentor Approvals', color: 'text-gold-brand' },
-  { value: '4.92 / 5', label: 'Student Rating', color: 'text-purple-400' },
+const OVERVIEW_FEATURES = [
+  {
+    icon: BookOpen,
+    title: 'Structured Learning Paths',
+    description: 'Sequenced roadmap modules guiding you step-by-step from core foundations to advanced applications.',
+    colorClass: 'text-purple-400 bg-purple-400/10 border-purple-400/20'
+  },
+  {
+    icon: Cpu,
+    title: 'AI Foundations',
+    description: 'Acquire core knowledge in machine learning, model architectures, and fundamental AI concepts.',
+    colorClass: 'text-cyan-400 bg-cyan-400/10 border-cyan-400/20'
+  },
+  {
+    icon: Video,
+    title: 'AI Content Creation',
+    description: 'Master generative tools for text, images, video, and audio production with prompt engineering.',
+    colorClass: 'text-pink-400 bg-pink-400/10 border-pink-400/20'
+  },
+  {
+    icon: Code,
+    title: 'AI Software Development',
+    description: 'Design and deploy full-stack software using modern AI coding assistants and API integrations.',
+    colorClass: 'text-indigo-400 bg-indigo-400/10 border-indigo-400/20'
+  },
+  {
+    icon: Bot,
+    title: 'Agentic Automation',
+    description: 'Develop and coordinate autonomous AI agents to handle real-world tasks and workflows automatically.',
+    colorClass: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20'
+  },
+  {
+    icon: Zap,
+    title: 'AgentEx Bootcamp',
+    description: 'Accelerate learning with hands-on bootcamp tracks designed for building agentic state machines.',
+    colorClass: 'text-amber-400 bg-amber-400/10 border-amber-400/20'
+  },
+  {
+    icon: Users,
+    title: 'Mentor Review System',
+    description: 'Submit capstone projects for evaluation by human mentors to receive detailed code and architectural reviews.',
+    colorClass: 'text-blue-400 bg-blue-400/10 border-blue-400/20'
+  },
+  {
+    icon: ClipboardCheck,
+    title: 'Assessments',
+    description: 'Lock in progress with structured checkpoint quizzes that require a passing score of 70% or more.',
+    colorClass: 'text-rose-400 bg-rose-400/10 border-rose-400/20'
+  },
+  {
+    icon: Award,
+    title: 'Certifications',
+    description: 'Receive cryptographically signed digital credentials when you complete a track and pass reviews.',
+    colorClass: 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20'
+  },
+  {
+    icon: Mic,
+    title: 'AI Voice Mentor',
+    description: 'Engage in conversational audio learning with an AI voice mentor to test your conceptual knowledge.',
+    colorClass: 'text-teal-400 bg-teal-400/10 border-teal-400/20'
+  }
 ];
 
-const TESTIMONIALS = [
+const JOURNEY_STEPS = [
   {
-    quote: '"The checkpoint system is genuinely transformative. You can\'t move forward without proving you understand. That\'s the accountability I needed."',
-    name: 'Tyler Brown',
-    title: 'Engineer, Vercel',
-    initials: 'TB',
-    bg: 'from-purple-electric/30 to-indigo-deep/30',
+    step: '01',
+    title: 'Select a Track & Level',
+    description: 'Choose from 4 specialized courses and select your target level (Beginner, Intermediate, or Advanced).',
+    glow: 'text-purple-400'
   },
   {
-    quote: '"As a mentor, the command console is incredibly fast. Analytics, student rosters, and project reviews all in one premium interface."',
-    name: 'Dr. Lisa Miller',
-    title: 'Curriculum Lead',
-    initials: 'LM',
-    bg: 'from-cyan-accent/30 to-purple-electric/30',
+    step: '02',
+    title: 'Engage the AI Voice Mentor',
+    description: 'Engage in real-time conversational Q&A to test your knowledge vocally and lock in core terminology.',
+    glow: 'text-cyan-400'
   },
   {
-    quote: '"The quiz gates are beautifully structured. If you fail, you see your exact score and the module notes again immediately. That feedback loop is powerful."',
-    name: 'Anna Chen',
-    title: 'Developer, Stripe',
-    initials: 'AC',
-    bg: 'from-gold-brand/30 to-cyan-accent/30',
+    step: '03',
+    title: 'Unlock Progress Gates',
+    description: 'Study module notes and video guides, then pass structured quiz gates with a score of 70% or more.',
+    glow: 'text-indigo-400'
   },
+  {
+    step: '04',
+    title: 'Build Capstone Projects',
+    description: 'Put theory into practice by developing complete solutions mapped to real-world applications.',
+    glow: 'text-pink-400'
+  },
+  {
+    step: '05',
+    title: 'Get Mentor Feedback',
+    description: 'Submit your code or assets to mentors for manual reviews, detailed evaluation, and approval.',
+    glow: 'text-blue-400'
+  },
+  {
+    step: '06',
+    title: 'Earn Verifiable Credentials',
+    description: 'Instantly download your cryptographically signed certificate of competency upon finishing all milestones.',
+    glow: 'text-yellow-500'
+  }
 ];
 
 export default function LandingPage({ onNavigate, isAuthenticated, user }) {
@@ -122,9 +193,9 @@ export default function LandingPage({ onNavigate, isAuthenticated, user }) {
           </div>
 
           <div className="hidden md:flex items-center gap-7 text-xs font-medium text-slate-400">
-            <button onClick={() => scrollToSection('features')} className="hover:text-cyan-400 transition-colors">Features</button>
-            <button onClick={() => scrollToSection('stats')} className="hover:text-cyan-400 transition-colors">Impact</button>
-            <button onClick={() => scrollToSection('testimonials')} className="hover:text-cyan-400 transition-colors">Stories</button>
+            <button onClick={() => scrollToSection('features')} className="hover:text-cyan-400 transition-colors">Methodology</button>
+            <button onClick={() => scrollToSection('overview')} className="hover:text-cyan-400 transition-colors">Overview</button>
+            <button onClick={() => scrollToSection('journey')} className="hover:text-cyan-400 transition-colors">Journey</button>
           </div>
 
           <div className="flex items-center gap-2.5">
@@ -310,54 +381,59 @@ export default function LandingPage({ onNavigate, isAuthenticated, user }) {
         </div>
       </section>
 
-      {/* ── Stats Section ────────────────────────────────────────── */}
-      <section id="stats" className="relative z-10 py-20 px-6">
+      {/* ── Platform Overview Section ────────────────────────────────────── */}
+      <section id="overview" className="relative z-10 py-24 px-6 border-t" style={{ borderColor: 'rgba(255,255,255,0.03)' }}>
         <div className="max-w-5xl mx-auto">
-          <div className="glass-panel rounded-3xl p-10 md:p-14">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-10 text-center">
-              {STATS.map((s, i) => (
-                <div key={i}>
-                  <div className={`text-4xl md:text-5xl font-black ${s.color}`} style={{ fontFamily: 'Space Grotesk' }}>
-                    {s.value}
+          <div className="text-center mb-16">
+            <p className="section-label mb-4">Platform Overview</p>
+            <h2 className="text-4xl md:text-5xl font-bold text-white max-w-2xl mx-auto" style={{ fontFamily: 'Space Grotesk' }}>
+              LumionaFlow & <span className="gradient-text-cyan">EduFlick AI</span> Features
+            </h2>
+            <p className="mt-4 text-slate-400 text-sm max-w-lg mx-auto leading-relaxed">
+              Explore the core capabilities that drive our automated learning ecosystem.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {OVERVIEW_FEATURES.map((f, i) => {
+              const Icon = f.icon;
+              return (
+                <div key={i} className="group glass-panel glass-panel-hover rounded-3xl p-7 transition-all duration-300">
+                  <div className={`w-11 h-11 rounded-2xl border flex items-center justify-center mb-5 transition-all group-hover:scale-110 ${f.colorClass}`}>
+                    <Icon className="h-4 w-4" />
                   </div>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mt-3">{s.label}</p>
+                  <h3 className="text-base font-bold text-white mb-2.5">{f.title}</h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">{f.description}</p>
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* ── Testimonials Section ─────────────────────────────────── */}
-      <section id="testimonials" className="relative z-10 py-28 px-6">
+      {/* ── Learning Journey Section ────────────────────────────── */}
+      <section id="journey" className="relative z-10 py-24 px-6 border-t" style={{ borderColor: 'rgba(255,255,255,0.03)' }}>
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-20">
-            <p className="section-label mb-4">Student Stories</p>
-            <h2 className="text-4xl md:text-5xl font-bold text-white" style={{ fontFamily: 'Space Grotesk' }}>
-              Learners who{' '}
-              <span className="gradient-text-cyan">transformed</span>
+          <div className="text-center mb-16">
+            <p className="section-label mb-4">Learning Journey</p>
+            <h2 className="text-4xl md:text-5xl font-bold text-white max-w-2xl mx-auto" style={{ fontFamily: 'Space Grotesk' }}>
+              Your Pathway to <span className="gradient-text">Competency</span>
             </h2>
+            <p className="mt-4 text-slate-400 text-sm max-w-lg mx-auto leading-relaxed">
+              Follow our structured, automated flow to master real-world AI skills.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {TESTIMONIALS.map((t, i) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {JOURNEY_STEPS.map((s, i) => (
               <div key={i} className="glass-panel glass-panel-hover rounded-3xl p-7 flex flex-col justify-between transition-all duration-300">
                 <div>
-                  <div className="flex gap-1 mb-5">
-                    {[...Array(5)].map((_, j) => (
-                      <Star key={j} className="h-3.5 w-3.5 fill-gold-brand text-gold-brand" />
-                    ))}
+                  <div className="flex justify-between items-center mb-4">
+                    <span className={`text-2xl font-black font-mono opacity-80 ${s.glow}`}>{s.step}</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-slate-700" />
                   </div>
-                  <p className="text-sm text-slate-300 leading-relaxed italic font-serif">{t.quote}</p>
-                </div>
-                <div className="flex items-center gap-3 mt-7 pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                  <div className={`w-9 h-9 rounded-full bg-gradient-to-tr ${t.bg} flex items-center justify-center text-xs font-bold text-white shrink-0`}>
-                    {t.initials}
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-white">{t.name}</div>
-                    <div className="text-[10px] text-slate-500">{t.title}</div>
-                  </div>
+                  <h3 className="text-base font-bold text-white mb-2.5">{s.title}</h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">{s.description}</p>
                 </div>
               </div>
             ))}
@@ -374,7 +450,7 @@ export default function LandingPage({ onNavigate, isAuthenticated, user }) {
               <span className="gradient-text">learning journey?</span>
             </h2>
             <p className="text-slate-400 text-base mb-10 max-w-md mx-auto leading-relaxed">
-              Join thousands of learners on an intelligent, automated path to mastery.
+              Begin your journey on LumionaFlow today and build real, verified competency through learning automation.
             </p>
             <button onClick={() => onNavigate('auth')}
               className="group inline-flex items-center gap-3 px-10 py-4 rounded-2xl text-sm font-bold text-white transition-all active:scale-[0.97]"
