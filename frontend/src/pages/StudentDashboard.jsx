@@ -80,7 +80,7 @@ const CATALOG_TRACKS = [
   }
 ];
 
-export default function StudentDashboard({ token, user, onLogout, backendUrl, theme, toggleTheme, onNavigateToAbout }) {
+export default function StudentDashboard({ token, user, onLogout, backendUrl, theme, toggleTheme, onNavigateToAbout, onNavigate }) {
   // ── State (unchanged) ──────────────────────────────────────────
   const [roadmap, setRoadmap] = useState([]);
   const [activeTab, setActiveTab] = useState('courses'); // 'courses' | 'catalog' | 'project'
@@ -358,12 +358,20 @@ export default function StudentDashboard({ token, user, onLogout, backendUrl, th
             { id: 'courses', label: 'Learning Progress', icon: BookOpen },
             { id: 'catalog', label: 'Course Catalog', icon: Compass },
             { id: 'project', label: 'Project Submission', icon: Award },
+            { id: 'ai-voice-mentor', label: 'AI Voice Mentor', icon: Sparkles },
           ].map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
             return (
               <button key={item.id}
-                onClick={() => { setActiveTab(item.id); setError(''); }}
+                onClick={() => {
+                  if (item.id === 'ai-voice-mentor') {
+                    onNavigate('ai-voice-mentor');
+                  } else {
+                    setActiveTab(item.id);
+                    setError('');
+                  }
+                }}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all text-left"
                 style={{
                   color: isActive ? '#A78BFA' : '#64748B',
@@ -437,15 +445,23 @@ export default function StudentDashboard({ token, user, onLogout, backendUrl, th
           <div className="flex lg:hidden gap-1.5 p-1 rounded-xl bg-white/[0.02] border border-white/[0.05]">
             {[
               { id: 'courses', label: 'Progress', icon: BookOpen },
-              { id: 'catalog', label: 'Course Catalog', icon: Compass },
+              { id: 'catalog', label: 'Catalog', icon: Compass },
               { id: 'project', label: 'Project', icon: Award },
+              { id: 'ai-voice-mentor', label: 'AI Voice', icon: Sparkles },
             ].map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
               return (
                 <button
                   key={item.id}
-                  onClick={() => { setActiveTab(item.id); setError(''); }}
+                  onClick={() => {
+                    if (item.id === 'ai-voice-mentor') {
+                      onNavigate('ai-voice-mentor');
+                    } else {
+                      setActiveTab(item.id);
+                      setError('');
+                    }
+                  }}
                   className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-[10px] font-bold transition-all"
                   style={{
                     color: isActive ? '#A78BFA' : '#64748B',

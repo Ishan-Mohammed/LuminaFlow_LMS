@@ -398,6 +398,99 @@ app.get('/api/student/certificate', authenticateToken, requireRole('student'), a
   }
 });
 
+// AI Mentor chat proxy endpoint using Groq
+app.post('/api/voice-ai/chat', authenticateToken, async (req, res) => {
+  try {
+    const { message, messages } = req.body;
+    let chatMessages = [];
+
+    if (messages && Array.isArray(messages)) {
+      chatMessages = messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+    } else if (message) {
+      chatMessages = [{ role: 'user', content: message }];
+    } else {
+      return res.status(400).json({ error: 'Message or messages array is required' });
+    }
+
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) {
+      return res.status(400).json({
+        error: 'Missing API key: GROQ_API_KEY is not configured in the backend environment variables (.env).'
+      });
+    }
+
+    const systemMessage = {
+      role: 'system',
+      content: `You are EduFlick AI Mentor.
+
+You help students learn:
+* Artificial Intelligence
+* Prompt Engineering
+* AI Content Creation
+* AI Software Development
+* Agentic Automation
+* AgentEx Bootcamp topics
+
+Guidelines:
+* Be beginner friendly
+* Give concise explanations
+* Use examples whenever appropriate
+* Encourage learning
+* Maintain a supportive educational tone`
+    };
+
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [systemMessage, ...chatMessages]
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch (e) {
+        errorData = { error: { message: errorText } };
+      }
+      
+      const errorMsg = errorData.error?.message || 'Failed to communicate with Groq API';
+      
+      if (response.status === 401) {
+        return res.status(401).json({ error: 'Invalid API key: The configured GROQ_API_KEY is unauthorized.' });
+      } else if (response.status === 429) {
+        return res.status(429).json({ error: 'Rate limit error: Too many requests sent to Groq. Please try again in a few seconds.' });
+      }
+      
+      return res.status(response.status).json({
+        error: `Groq API failure: ${errorMsg}`
+      });
+    }
+
+    const data = await response.json();
+    const assistantText = data.choices?.[0]?.message?.content;
+    
+    if (!assistantText) {
+      return res.status(500).json({ error: 'Empty response: The AI Mentor did not generate any content.' });
+    }
+
+    res.json({ response: assistantText });
+  } catch (err) {
+    console.error('Error in AI Mentor proxy route:', err);
+    res.status(500).json({ error: 'Groq API failure: Failed to communicate with language model provider.' });
+  }
+});
+
+
 // --- MENTOR ENDPOINTS ---
 
 // View all students and their dynamic progress percentages

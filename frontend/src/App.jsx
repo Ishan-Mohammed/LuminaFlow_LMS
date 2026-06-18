@@ -5,12 +5,13 @@ import StudentDashboard from './pages/StudentDashboard.jsx';
 import MentorDashboard from './pages/MentorDashboard.jsx';
 import StudentOnboarding from './pages/StudentOnboarding.jsx';
 import AboutProject from './pages/AboutProject.jsx';
+import AIVoiceMentor from './pages/AIVoiceMentor.jsx';
 import { Loader2, Sparkles } from 'lucide-react';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export default function App() {
-  const [page, setPage] = useState('landing'); // 'landing' | 'auth' | 'student-onboarding' | 'student-dashboard' | 'mentor-dashboard' | 'about-project'
+  const [page, setPage] = useState('landing'); // 'landing' | 'auth' | 'student-onboarding' | 'student-dashboard' | 'mentor-dashboard' | 'about-project' | 'ai-voice-mentor'
   const [previousPage, setPreviousPage] = useState('landing');
   const [token, setToken] = useState(localStorage.getItem('lumina_token') || null);
   const [user, setUser] = useState(null);
@@ -32,6 +33,11 @@ export default function App() {
   useEffect(() => {
     const checkSession = async () => {
       if (!token) {
+        if (window.location.pathname === '/ai-voice-mentor') {
+          setPage('auth');
+        } else {
+          setPage('landing');
+        }
         setLoadingSession(false);
         return;
       }
@@ -54,7 +60,9 @@ export default function App() {
         if (data.role === 'mentor') {
           setPage('mentor-dashboard');
         } else {
-          if (data.selected_course_id) {
+          if (window.location.pathname === '/ai-voice-mentor') {
+            setPage('ai-voice-mentor');
+          } else if (data.selected_course_id) {
             setPage('student-dashboard');
           } else {
             setPage('student-onboarding');
@@ -71,6 +79,37 @@ export default function App() {
     checkSession();
   }, [token]);
 
+  // Listen for back/forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      if (path === '/ai-voice-mentor') {
+        if (token) {
+          setPage('ai-voice-mentor');
+        } else {
+          setPage('auth');
+        }
+      } else if (path === '/') {
+        if (token && user) {
+          setPage(user.role === 'mentor' ? 'mentor-dashboard' : 'student-dashboard');
+        } else {
+          setPage('landing');
+        }
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [token, user]);
+
+  const navigateToPage = (newPage) => {
+    if (newPage === 'ai-voice-mentor') {
+      window.history.pushState({}, '', '/ai-voice-mentor');
+    } else if (window.location.pathname !== '/') {
+      window.history.pushState({}, '', '/');
+    }
+    setPage(newPage);
+  };
+
   const handleAuthSuccess = (newToken, newUser) => {
     localStorage.setItem('lumina_token', newToken);
     setToken(newToken);
@@ -79,7 +118,9 @@ export default function App() {
     if (newUser.role === 'mentor') {
       setPage('mentor-dashboard');
     } else {
-      if (newUser.selected_course_id) {
+      if (window.location.pathname === '/ai-voice-mentor') {
+        setPage('ai-voice-mentor');
+      } else if (newUser.selected_course_id) {
         setPage('student-dashboard');
       } else {
         setPage('student-onboarding');
@@ -101,6 +142,9 @@ export default function App() {
     setToken(null);
     setUser(null);
     setPage('landing');
+    if (window.location.pathname !== '/') {
+      window.history.pushState({}, '', '/');
+    }
   };
 
   const toggleTheme = () => {
@@ -148,7 +192,7 @@ export default function App() {
       {/* Pages Router Switcher */}
       {page === 'landing' && (
         <LandingPage
-          onNavigate={setPage}
+          onNavigate={navigateToPage}
           isAuthenticated={!!token}
           user={user}
         />
@@ -156,7 +200,7 @@ export default function App() {
 
       {page === 'auth' && (
         <AuthPage
-          onNavigate={setPage}
+          onNavigate={navigateToPage}
           onAuthSuccess={handleAuthSuccess}
           backendUrl={BACKEND_URL}
         />
@@ -186,6 +230,19 @@ export default function App() {
           theme={theme}
           toggleTheme={toggleTheme}
           onNavigateToAbout={navigateToAbout}
+          onNavigate={navigateToPage}
+        />
+      )}
+
+      {page === 'ai-voice-mentor' && (
+        <AIVoiceMentor
+          token={token}
+          user={user}
+          onLogout={handleLogout}
+          backendUrl={BACKEND_URL}
+          theme={theme}
+          toggleTheme={toggleTheme}
+          onNavigate={navigateToPage}
         />
       )}
 
