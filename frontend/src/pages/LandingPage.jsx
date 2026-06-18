@@ -175,6 +175,13 @@ export default function LandingPage({ onNavigate, isAuthenticated, user }) {
           <span className="gradient-text">FLOW</span>
         </h1>
 
+        <div className="animate-fade-slide-up opacity-0 delay-300 mt-4 text-xs md:text-sm font-semibold tracking-widest uppercase"
+          style={{ animationFillMode: 'forwards' }}>
+          <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent filter drop-shadow-[0_0_10px_rgba(6,182,212,0.4)]">
+            Powered by EduFlick AI
+          </span>
+        </div>
+
         <p className="animate-fade-slide-up opacity-0 delay-400 mt-6 text-xl md:text-2xl font-light text-slate-400 max-w-2xl leading-relaxed"
           style={{ animationFillMode: 'forwards' }}>
           Transforming Learning Through{' '}
